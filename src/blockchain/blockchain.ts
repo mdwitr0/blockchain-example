@@ -38,13 +38,18 @@ export class Blockchain implements IBlockchain {
     }
 
     createTransaction(transaction: ITransaction): boolean {
-        const balance = this.getBalanceOfAddress(transaction.fromAddress);
-        if (balance < transaction.amount) {
-            console.log('Not enough balance to perform this transaction');
-            return false;
+        const senderBalance = this.getBalanceOfAddress(transaction.fromAddress);
+        if (senderBalance < transaction.amount) {
+            throw new Error('Not enough balance to perform this transaction');
         }
+        if (transaction.amount <= 0) {
+            throw new Error('Transaction amount should be positive');
+        }
+        this.balances[transaction.fromAddress] -= transaction.amount;
+        this.balances[transaction.toAddress] = (this.balances[transaction.toAddress] || 0) + transaction.amount;
 
-        this.pendingTransactions.push(transaction);
+        const tx = new Transaction(transaction.fromAddress, transaction.toAddress, transaction.amount);
+        this.pendingTransactions.push(tx);
         return true;
     }
 
