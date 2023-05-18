@@ -37,5 +37,24 @@ app.get("/stats", async (req, res) => {
     res.send(stats);
 });
 
+app.get("/block/latest", async (req, res) => {
+    const latestBlock = await blockchain.getLatestBlock();
+    res.send(latestBlock);
+});
+
+app.post("/tamper", async (req, res) => {
+    const { blockIndex, newHash } = req.body;
+    const blockToTamper = blockchain.chain[blockIndex];
+    
+    if (!blockToTamper) {
+        res.status(400).send({ error: "Block not found" });
+        return;
+    }
+    
+    blockToTamper.hash = newHash;
+    
+    res.send({ message: "Block tampered successfully", block: blockToTamper });
+});
+
 app.listen(3000, () => console.log("Server running on port 3000"));
 
