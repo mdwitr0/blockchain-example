@@ -1,4 +1,4 @@
-import { text, intro, cancel, isCancel } from '@clack/prompts';
+import { text, confirm, intro, cancel, isCancel } from '@clack/prompts';
 import axios from 'axios';
 import WebSocket from 'ws';
 import chalk from 'chalk';
@@ -12,7 +12,7 @@ const createWebSocketConnection = (url: string, onOpen: () => void, onMessage: (
     ws.on('message', onMessage);
 };
 
-const startMining = (minerAddress: string) => {
+const startMining = (minerAddress: string, mineOneBlockOnly: boolean) => {
     let blockCount = 0;
     const startTime = Date.now();
 
@@ -27,8 +27,11 @@ const startMining = (minerAddress: string) => {
                 console.log(chalk.green(performanceMessage));
                 if (progress.message === 'Block mined') {
                     blockCount++;
-
-                    axios.post(`${blockchainApiUrl}/mine`, { minerAddress });
+                    if (mineOneBlockOnly) {
+                        process.exit(0);
+                    } else {
+                        axios.post(`${blockchainApiUrl}/mine`, { minerAddress });
+                    }
                 } else {
                     console.log(chalk.blue(`Mining... Current hash: ${progress.hash}, nonce: ${progress.nonce}`));
                 }
@@ -52,8 +55,17 @@ async function bootstrap() {
         process.exit(0);
     }
 
+    const mineOneBlockOnly = await confirm({
+        message: 'Do you want to mine only one block?',
+    });
+
+    if (isCancel(mineOneBlockOnly)) {
+        cancel('Operation cancelled.');
+        process.exit(0);
+    }
+
     try {
-        startMining(minerAddress);
+        startMining(minerAddress, mineOneBlockOnly);
     } catch (error) {
         console.error(chalk.red(error));
     }
