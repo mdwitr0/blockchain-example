@@ -4,20 +4,31 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "run": "ts-node src/index.ts",
+    "start:network": "ts-node src/index.ts",
+    "start:miner": "ts-node src/miner.ts",
     "test": "jest"
   },
   "author": "mdwitr0",
   "license": "ISC",
   "dependencies": {
+    "@clack/prompts": "^0.6.3",
+    "axios": "^1.4.0",
+    "blessed": "^0.1.81",
+    "chalk": "^4.1.2",
     "crypto-js": "^4.1.1",
+    "express": "^4.18.2",
     "ts-node": "^10.9.1",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "ws": "^8.13.0"
   },
   "devDependencies": {
+    "@types/blessed": "^0.1.21",
     "@types/crypto-js": "^4.1.1",
+    "@types/express": "^4.17.17",
     "@types/jest": "^29.5.1",
     "@types/mocha": "^10.0.1",
+    "@types/react": "^18.2.6",
+    "@types/ws": "^8.5.4",
     "jest": "^29.5.0",
     "ts-jest": "^29.1.0"
   }
