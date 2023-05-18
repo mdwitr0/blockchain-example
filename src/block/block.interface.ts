@@ -8,4 +8,5 @@ export interface IBlock {
     nonce: number;
 
     calculateHash(): string;
+    mineBlock(difficulty: number): void;
 }

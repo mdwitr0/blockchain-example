@@ -2,20 +2,26 @@ import { Block } from "../block/block";
 import { IBlock } from "../block/block.interface";
 import { Transaction } from "../transaction/transaction";
 import { ITransaction } from "../transaction/transaction.interface";
+import { WsServer } from "../ws/ws-server";
+import { IWsServer } from "../ws/ws-server.interface";
 import { Balances, IBlockchain } from "./blockchain.interface";
 
 export class Blockchain implements IBlockchain {
+    private wsServer!: WsServer;
+    
     public chain!: IBlock[];
     public pendingTransactions: ITransaction[] = [];
     public miningReward: number = 100;
+    public difficulty: number = 2;
     balances: Balances = {};
 
-    constructor() {
+    constructor(wsServer: WsServer) {
+        this.wsServer = wsServer;
         this.chain = [this.createGenesisBlock()];
     }
 
     createGenesisBlock(): IBlock {
-        return new Block(Date.now(), [], "0");
+        return new Block(this.wsServer, Date.now(), [], "0");
     }
 
     getLatestBlock(): IBlock {
@@ -25,7 +31,10 @@ export class Blockchain implements IBlockchain {
 
     minePendingTransactions(miningRewardAddress: string): void {
         const latestBlock = this.getLatestBlock();
-        const block = new Block(Date.now(), this.pendingTransactions, latestBlock.hash);
+        const block = new Block(this.wsServer,Date.now(), this.pendingTransactions, latestBlock.hash);
+
+        block.mineBlock(this.difficulty);
+
         this.chain.push(block);
 
         this.pendingTransactions.forEach(transaction => {

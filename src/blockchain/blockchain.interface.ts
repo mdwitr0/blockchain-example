@@ -8,6 +8,7 @@ export interface IBlockchain {
     pendingTransactions: ITransaction[];
     miningReward: number;
     balances: Balances;
+    difficulty: number;
     
     createGenesisBlock(): IBlock;
     getLatestBlock(): IBlock;
