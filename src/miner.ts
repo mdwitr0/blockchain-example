@@ -21,12 +21,13 @@ const startMining = (minerAddress: string) => {
         (message: Buffer) => {
             try {
                 const progress = JSON.parse(message.toString());
+                const elapsedTime = (Date.now() - startTime) / 1000;  // in seconds
+                const speed = blockCount / elapsedTime;
+                const performanceMessage = `Block count: ${blockCount}, elapsed time: ${elapsedTime.toFixed(2)}s, mining speed: ${speed.toFixed(2)} blocks/s`;
+                console.log(chalk.green(performanceMessage));
                 if (progress.message === 'Block mined') {
                     blockCount++;
-                    const elapsedTime = (Date.now() - startTime) / 1000;  // in seconds
-                    const speed = blockCount / elapsedTime;
-                    const performanceMessage = `Block count: ${blockCount}\nElapsed time: ${elapsedTime.toFixed(2)}s\nMining speed: ${speed.toFixed(2)} blocks/s`;
-                    console.log(chalk.green(`\n\n*=========================================*\n${performanceMessage}\n*=========================================*\n\n`));
+
                     axios.post(`${blockchainApiUrl}/mine`, { minerAddress });
                 } else {
                     console.log(chalk.blue(`Mining... Current hash: ${progress.hash}, nonce: ${progress.nonce}`));

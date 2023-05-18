@@ -12,7 +12,9 @@ export class Blockchain implements IBlockchain {
     public chain!: IBlock[];
     public pendingTransactions: ITransaction[] = [];
     public miningReward: number = 100;
-    public difficulty: number = 2;
+    public difficulty: number = 1;
+    public halvingInterval: number = 100;
+
     balances: Balances = {};
 
     constructor(wsServer: WsServer) {
@@ -42,6 +44,12 @@ export class Blockchain implements IBlockchain {
             this.balances[transaction.toAddress] = this.getBalanceOfAddress(transaction.toAddress) + transaction.amount;
         });
 
+        // Halving logic
+        if (this.chain.length % this.halvingInterval === 0) {
+            this.miningReward /= 2;
+            this.difficulty += 1;
+        }
+    
         const transaction = new Transaction("", miningRewardAddress, this.miningReward);
         this.pendingTransactions = [transaction];
     }
@@ -54,8 +62,6 @@ export class Blockchain implements IBlockchain {
         if (transaction.amount <= 0) {
             throw new Error('Transaction amount should be positive');
         }
-        this.balances[transaction.fromAddress] -= transaction.amount;
-        this.balances[transaction.toAddress] = (this.balances[transaction.toAddress] || 0) + transaction.amount;
 
         const tx = new Transaction(transaction.fromAddress, transaction.toAddress, transaction.amount);
         this.pendingTransactions.push(tx);
@@ -81,5 +87,18 @@ export class Blockchain implements IBlockchain {
         }
 
         return true;
+    }
+
+    async getStats(): Promise<any> {
+        const stats = {
+            blocks: this.chain.length,
+            difficulty: this.difficulty,
+            miningReward: this.miningReward,
+            halvingInterval: this.halvingInterval,
+            pendingTransactions: this.pendingTransactions.length,
+            isChainValid: this.isChainValid(),
+        };
+
+        return stats;
     }
 }

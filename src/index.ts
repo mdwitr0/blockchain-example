@@ -32,5 +32,10 @@ app.post("/mine", async (req, res) => {
     res.send("Block successfully mined.");
 });
 
+app.get("/stats", async (req, res) => {
+    const stats = await blockchain.getStats();
+    res.send(stats);
+});
+
 app.listen(3000, () => console.log("Server running on port 3000"));
 
