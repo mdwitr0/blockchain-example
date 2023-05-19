@@ -39,7 +39,13 @@ app.get("/stats", async (req, res) => {
 
 app.get("/block/latest", async (req, res) => {
     const latestBlock = await blockchain.getLatestBlock();
-    res.send(latestBlock);
+    res.send({
+        transactions: latestBlock.transactions,
+        hash: latestBlock.hash,
+        previousHash: latestBlock.previousHash,
+        nonce: latestBlock.nonce,
+        timestamp: latestBlock.timestamp,
+    });
 });
 
 app.post("/tamper", async (req, res) => {
@@ -53,7 +59,13 @@ app.post("/tamper", async (req, res) => {
     
     blockToTamper.hash = newHash;
     
-    res.send({ message: "Block tampered successfully", block: blockToTamper });
+    res.send({ message: "Block tampered successfully", block: {
+        transactions: blockToTamper.transactions,
+        hash: blockToTamper.hash,
+        previousHash: blockToTamper.previousHash,
+        nonce: blockToTamper.nonce,
+        timestamp: blockToTamper.timestamp,
+    } });
 });
 
 app.listen(3000, () => console.log("Server running on port 3000"));

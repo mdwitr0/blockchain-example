@@ -3,7 +3,6 @@ import { IBlock } from "../block/block.interface";
 import { Transaction } from "../transaction/transaction";
 import { ITransaction } from "../transaction/transaction.interface";
 import { WsServer } from "../ws/ws-server";
-import { IWsServer } from "../ws/ws-server.interface";
 import { Balances, IBlockchain } from "./blockchain.interface";
 
 export class Blockchain implements IBlockchain {
